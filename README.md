@@ -1,5 +1,7 @@
 # Landing page A/B test
 
+**Live:** https://landing-pages-phi-ten.vercel.app
+
 Four versions of one landing page. Each tests a different pitch for the same app, and every visitor sees one of them. Each signup and unique visitor is saved to a Google Sheet, and `/stats` shows which pitch converts best.
 
 | URL | What it does |
@@ -24,23 +26,23 @@ You can sort, filter or download it like any sheet. Don't rename the tabs or reo
 
 ## How to see stats
 
-Go to `https://YOUR-SITE/stats` and enter the stats password. You'll see:
+Go to `https://landing-pages-phi-ten.vercel.app/stats` and enter the stats password. You'll see:
 
 - **By variant**: visitors, signups, conversion rate, and % of signups who'd invite friends.
 - **By traffic source**: the same numbers split by `utm_source` (reddit, discord, ...).
 
 Hit **Refresh** to update. Rule of thumb: don't pick a winner until every variant has 100+ visitors and roughly 15+ signups.
 
-**Don't pollute your own stats:** open `https://YOUR-SITE/?notrack=1` once on each phone or laptop you use. That browser's visits stop being counted. (`?notrack=0` turns counting back on.) Test signups do get saved, so delete those rows from the sheet.
+**Don't pollute your own stats:** open `https://landing-pages-phi-ten.vercel.app/?notrack=1` once on each phone or laptop you use. That browser's visits stop being counted. (`?notrack=0` turns counting back on.) Test signups do get saved, so delete those rows from the sheet.
 
 ## How to tag traffic sources (UTM links)
 
 Add `utm_source` (and optionally `utm_campaign`) to the link you post:
 
 ```
-https://YOUR-SITE/?utm_source=reddit&utm_campaign=r-malementalhealth
-https://YOUR-SITE/?utm_source=discord&utm_campaign=server-name
-https://YOUR-SITE/?utm_source=tiktok
+https://landing-pages-phi-ten.vercel.app/?utm_source=reddit&utm_campaign=r-malementalhealth
+https://landing-pages-phi-ten.vercel.app/?utm_source=discord&utm_campaign=server-name
+https://landing-pages-phi-ten.vercel.app/?utm_source=tiktok
 ```
 
 Use lowercase and no spaces. Stats are grouped by `utm_source`, and the full UTMs are saved on each signup row.
