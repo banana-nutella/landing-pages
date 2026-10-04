@@ -1,0 +1,10 @@
+{
+  "name": "landing-pages",
+  "private": true,
+  "scripts": {
+    "build": "node build.js"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}

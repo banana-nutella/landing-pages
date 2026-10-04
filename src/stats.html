@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Test stats</title>
+<style>
+  :root { --bg: #0a0a0a; --surface: #151515; --line: #262626; --text: #f4f4f2; --muted: #9a9a96; --accent: #c8ff2e; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px 16px 40px; max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 15px; margin: 32px 0 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+  .meta { color: var(--muted); font-size: 13px; margin: 0 0 20px; }
+  .wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+  th, td { padding: 11px 12px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--surface); }
+  tr:last-child td { border-bottom: 0; }
+  tr.best td { color: var(--accent); font-weight: 700; }
+  .small { color: var(--muted); font-size: 12px; font-weight: 400; }
+  .note { color: var(--muted); font-size: 13px; line-height: 1.5; margin-top: 14px; }
+  form { display: flex; gap: 8px; margin-top: 16px; }
+  input { flex: 1; font: inherit; font-size: 16px; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+  button { font: inherit; font-weight: 700; background: var(--accent); color: #0a0a0a; border: 0; border-radius: 8px; padding: 12px 16px; cursor: pointer; }
+  .ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); font-weight: 600; padding: 8px 12px; font-size: 13px; }
+  .err { color: #ff7a6b; font-size: 14px; }
+  #out { display: none; }
+  @media (max-width: 520px) { td .small { display: block; margin-top: 2px; } table { font-size: 13px; } th, td { padding: 10px 7px; } th { font-size: 11px; } }
+</style>
+</head>
+<body>
+<h1>A/B test stats</h1>
+<div id="login">
+  <p class="meta">Enter the stats password.</p>
+  <form id="f"><input type="password" id="pw" placeholder="Password" autocomplete="current-password"><button>View</button></form>
+  <p class="err" id="err"></p>
+</div>
+
+<div id="out">
+  <p class="meta"><span id="updated"></span> · <button class="ghost" id="refresh">Refresh</button> <button class="ghost" id="logout">Log out</button></p>
+
+  <h2>By variant</h2>
+  <div class="wrap"><table>
+    <thead><tr><th>Variant</th><th>Visitors</th><th>Signups</th><th>Conv.</th><th>Invite %</th></tr></thead>
+    <tbody id="variants"></tbody>
+  </table></div>
+  <p class="note">Conv. = signups ÷ visitors. Invite % = share of signups who said they'd invite friends. Highlighted row = best conversion so far. Don't call a winner until each variant has at least ~100 visitors, and ideally 15+ signups each. Below that, differences are mostly noise.</p>
+
+  <h2>By traffic source</h2>
+  <div class="wrap"><table>
+    <thead><tr><th>Source</th><th>Var.</th><th>Visitors</th><th>Signups</th><th>Conv.</th></tr></thead>
+    <tbody id="sources"></tbody>
+  </table></div>
+  <p class="note">Source = the utm_source in the link. "(none)" = visitors whose link had no utm_source. Visitors are unique people; each is counted once per variant.</p>
+</div>
+
+<script>
+var NAMES = {{variantNames}};
+var pwKey = "stats_pw";
+function lsGet(k) { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+function pct(a, b) { return b ? (100 * a / b).toFixed(1) + "%" : "–"; }
+function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+function load(pw) {
+  document.getElementById("err").textContent = "Loading…";
+  fetch("/api/stats", { headers: { "x-stats-password": pw } })
+    .then(function (r) {
+      if (r.status === 401) throw new Error("Wrong password.");
+      if (!r.ok) throw new Error("Couldn't load stats. Is the Google Sheet connected?");
+      return r.json();
+    })
+    .then(function (d) { lsSet(pwKey, pw); render(d); })
+    .catch(function (e) {
+      document.getElementById("login").style.display = "block";
+      document.getElementById("out").style.display = "none";
+      document.getElementById("err").textContent = e.message;
+    });
+}
+
+function render(d) {
+  document.getElementById("login").style.display = "none";
+  document.getElementById("out").style.display = "block";
+  document.getElementById("updated").textContent = "Updated " + new Date().toLocaleTimeString();
+
+  var best = null, bestRate = -1;
+  Object.keys(NAMES).forEach(function (v) {
+    var s = d.variants[v] || { visitors: 0, signups: 0, invite: 0 };
+    var rate = s.visitors ? s.signups / s.visitors : 0;
+    if (s.signups && rate > bestRate) { bestRate = rate; best = v; }
+  });
+
+  var rows = "", tv = 0, ts = 0, ti = 0;
+  Object.keys(NAMES).forEach(function (v) {
+    var s = d.variants[v] || { visitors: 0, signups: 0, invite: 0 };
+    tv += s.visitors; ts += s.signups; ti += s.invite;
+    rows += '<tr' + (v === best ? ' class="best"' : '') + '><td>' + v.toUpperCase() + ' <span class="small">' + esc(NAMES[v]) + '</span></td><td>' +
+      s.visitors + '</td><td>' + s.signups + '</td><td>' + pct(s.signups, s.visitors) + '</td><td>' + pct(s.invite, s.signups) + '</td></tr>';
+  });
+  rows += '<tr><td><b>Total</b></td><td>' + tv + '</td><td>' + ts + '</td><td>' + pct(ts, tv) + '</td><td>' + pct(ti, ts) + '</td></tr>';
+  document.getElementById("variants").innerHTML = rows;
+
+  var src = d.sources.slice().sort(function (a, b) { return b.visitors - a.visitors || (a.source + a.variant).localeCompare(b.source + b.variant); });
+  document.getElementById("sources").innerHTML = src.length ? src.map(function (s) {
+    return '<tr><td>' + esc(s.source || "(none)") + '</td><td>' + esc(String(s.variant).toUpperCase()) + '</td><td>' + s.visitors + '</td><td>' + s.signups + '</td><td>' + pct(s.signups, s.visitors) + '</td></tr>';
+  }).join("") : '<tr><td colspan="5" class="small">No data yet.</td></tr>';
+}
+
+document.getElementById("f").addEventListener("submit", function (e) { e.preventDefault(); load(document.getElementById("pw").value); });
+document.getElementById("refresh").addEventListener("click", function () { load(lsGet(pwKey)); });
+document.getElementById("logout").addEventListener("click", function () { lsDel(pwKey); location.reload(); });
+if (lsGet(pwKey)) load(lsGet(pwKey));
+</script>
+</body>
+</html>

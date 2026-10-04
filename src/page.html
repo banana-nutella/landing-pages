@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{headline}}</title>
+<meta name="description" content="{{subline}}">
+<meta property="og:title" content="{{headline}}">
+<meta property="og:description" content="{{subline}}">
+<meta name="theme-color" content="#0a0a0a">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #151515;
+    --line: #2a2a2a;
+    --text: #f4f4f2;
+    --muted: #9a9a96;
+    --accent: #c8ff2e;
+    --accent-ink: #0a0a0a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh; min-height: 100svh;
+    display: flex; flex-direction: column;
+    padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+  }
+  .top { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .mark { width: 14px; height: 14px; background: var(--accent); transform: skewX(-12deg); }
+  main { flex: 1; display: flex; flex-direction: column; justify-content: center; width: 100%; max-width: 560px; margin: 0 auto; padding: 28px 0 8px; }
+  .bar { width: 44px; height: 4px; background: var(--accent); margin-bottom: 18px; transform: skewX(-12deg); }
+  h1 { font-size: clamp(32px, 9vw, 54px); line-height: 1.02; letter-spacing: -.03em; font-weight: 800; margin: 0 0 14px; }
+  .sub { font-size: clamp(16px, 4.4vw, 19px); line-height: 1.45; color: var(--muted); margin: 0 0 26px; }
+  form { display: flex; flex-direction: column; gap: 14px; }
+  input[type=email] {
+    width: 100%; font: inherit; font-size: 17px; color: var(--text);
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 15px 16px; outline: none;
+  }
+  input[type=email]:focus { border-color: var(--accent); }
+  input[type=email]::placeholder { color: #666; }
+  .q { font-size: 13px; font-weight: 600; color: var(--muted); margin: 2px 0 8px; }
+  .q span { font-weight: 400; color: #666; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font: inherit; font-size: 14px; font-weight: 600; color: var(--text);
+    background: transparent; border: 1px solid var(--line); border-radius: 999px;
+    padding: 9px 14px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .chip[aria-pressed=true] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .check { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--text); cursor: pointer; line-height: 1.35; }
+  .check input { appearance: none; -webkit-appearance: none; flex: none; width: 20px; height: 20px; margin: 0; border: 1px solid #555; border-radius: 5px; background: var(--surface); display: grid; place-content: center; cursor: pointer; }
+  .check input:checked { background: var(--accent); border-color: var(--accent); }
+  .check input:checked::after { content: ""; width: 10px; height: 6px; border: solid var(--accent-ink); border-width: 0 0 2.5px 2.5px; transform: translateY(-1px) rotate(-45deg); }
+  button[type=submit] {
+    font: inherit; font-size: 17px; font-weight: 800; letter-spacing: .01em;
+    color: var(--accent-ink); background: var(--accent); border: 0; border-radius: 10px;
+    padding: 16px; margin-top: 6px; cursor: pointer;
+  }
+  button[type=submit]:disabled { opacity: .6; cursor: wait; }
+  .fine { font-size: 12px; color: #6f6f6b; text-align: center; margin: 2px 0 0; }
+  .err { font-size: 14px; color: #ff7a6b; margin: 0; display: none; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .thanks { display: none; }
+  .thanks h2 { font-size: 30px; font-weight: 800; letter-spacing: -.02em; margin: 0 0 8px; }
+  .thanks p { color: var(--muted); font-size: 16px; line-height: 1.45; margin: 0; }
+  .done form { display: none; }
+  .done .thanks { display: block; }
+  @media (min-width: 700px) {
+    body { padding: 32px 40px; }
+  }
+</style>
+</head>
+<body>
+<div class="top"><div class="mark"></div>{{brand}}</div>
+<main>
+  <div class="bar"></div>
+  <h1>{{headline}}</h1>
+  <p class="sub">{{subline}}</p>
+
+  <form id="f" novalidate>
+    <input type="email" name="email" placeholder="{{emailPlaceholder}}" autocomplete="email" inputmode="email" required aria-label="Email">
+
+    <div>
+      <p class="q">{{helpQuestion}} <span>(optional)</span></p>
+      <div class="chips">{{helpChips}}</div>
+    </div>
+
+    <label class="check"><input type="checkbox" name="chat"> {{chatCheckbox}}</label>
+    <label class="check"><input type="checkbox" name="invite"> {{inviteCheckbox}}</label>
+
+    <div class="hp" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
+
+    <p class="err" id="err"></p>
+    <button type="submit">{{button}}</button>
+    <p class="fine">{{finePrint}}</p>
+  </form>
+
+  <div class="thanks" role="status">
+    <h2>{{thanksTitle}}</h2>
+    <p>{{thanksText}}</p>
+  </div>
+</main>
+
+<script>
+(function () {
+  var VARIANT = "{{variant}}";
+  var UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
+
+  function getCookie(n) { var m = document.cookie.match("(?:^|; )" + n + "=([^;]*)"); return m ? decodeURIComponent(m[1]) : ""; }
+  function setCookie(n, v) { document.cookie = n + "=" + encodeURIComponent(v) + "; path=/; max-age=31536000; samesite=lax"; }
+  function lsGet(k) { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+  // Anonymous visitor id, so each person is counted once.
+  var vid = getCookie("vid");
+  if (!vid) { vid = Date.now().toString(36) + Math.random().toString(36).slice(2, 10); }
+  setCookie("vid", vid);
+
+  // UTM params: use the ones in the URL, or remember the last ones we saw.
+  var params = new URLSearchParams(location.search);
+  var utm = {}, hasUtm = false;
+  UTM_KEYS.forEach(function (k) { var v = params.get(k); if (v) { utm[k] = v.slice(0, 200); hasUtm = true; } });
+  if (hasUtm) lsSet("utm", JSON.stringify(utm));
+  else { try { utm = JSON.parse(lsGet("utm") || "{}"); } catch (e) { utm = {}; } }
+
+  // Referrer: an outside site that sent them here (the root page saves it before redirecting).
+  var ref = "";
+  try { if (document.referrer && new URL(document.referrer).host !== location.host) ref = document.referrer; } catch (e) {}
+  if (ref) lsSet("ref", ref); else ref = lsGet("ref");
+
+  // ?notrack=1 stops counting your own visits on this browser (?notrack=0 turns it back on).
+  if (params.get("notrack") === "1") lsSet("notrack", "1");
+  if (params.get("notrack") === "0") lsDel("notrack");
+
+  function payload(extra) {
+    var p = { variant: VARIANT, vid: vid, referrer: ref.slice(0, 500) };
+    UTM_KEYS.forEach(function (k) { p[k] = utm[k] || ""; });
+    for (var k in extra) p[k] = extra[k];
+    return p;
+  }
+
+  // Count one unique visit per person per variant.
+  if (!lsGet("notrack") && !getCookie("seen_" + VARIANT)) {
+    var body = JSON.stringify(payload({}));
+    var sent = false;
+    try { sent = navigator.sendBeacon && navigator.sendBeacon("/api/visit", new Blob([body], { type: "application/json" })); } catch (e) {}
+    if (!sent) fetch("/api/visit", { method: "POST", headers: { "Content-Type": "application/json" }, body: body, keepalive: true }).catch(function () {});
+    setCookie("seen_" + VARIANT, "1");
+  }
+
+  // Help-with chips: pick one, tap again to unpick.
+  var help = "";
+  var chips = document.querySelectorAll(".chip");
+  chips.forEach(function (c) {
+    c.addEventListener("click", function () {
+      var on = c.getAttribute("aria-pressed") !== "true";
+      chips.forEach(function (o) { o.setAttribute("aria-pressed", "false"); });
+      c.setAttribute("aria-pressed", on ? "true" : "false");
+      help = on ? c.textContent : "";
+    });
+  });
+
+  var form = document.getElementById("f");
+  var err = document.getElementById("err");
+  var btn = form.querySelector("button[type=submit]");
+  function showErr(msg) { err.textContent = msg; err.style.display = "block"; }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    err.style.display = "none";
+    var email = form.email.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr("Enter a valid email."); form.email.focus(); return; }
+    btn.disabled = true;
+    var label = btn.textContent;
+    btn.textContent = "Saving…";
+    fetch("/api/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload({
+        email: email,
+        help: help,
+        chat: form.chat.checked,
+        invite: form.invite.checked,
+        website: form.website.value
+      }))
+    }).then(function (r) {
+      if (!r.ok) throw new Error();
+      document.body.classList.add("done");
+    }).catch(function () {
+      showErr("Something went wrong. Try again in a sec.");
+      btn.disabled = false;
+      btn.textContent = label;
+    });
+  });
+})();
+</script>
+</body>
+</html>

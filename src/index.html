@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Early access</title>
+<meta name="theme-color" content="#0a0a0a">
+<style>html, body { margin: 0; background: #0a0a0a; color: #f4f4f2; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; } a { color: #c8ff2e; }</style>
+<script>
+// Pick a variant for this visitor (or reuse the one they already got) and send them there.
+// ?v=a|b|c|d forces a specific variant. All other URL params (UTMs) are kept.
+(function () {
+  var ok = ["a", "b", "c", "d"];
+  var params = new URLSearchParams(location.search);
+  var m = document.cookie.match("(?:^|; )variant=([^;]*)");
+  var v = params.get("v");
+  if (ok.indexOf(v) < 0) v = m ? m[1] : "";
+  if (ok.indexOf(v) < 0) v = ok[Math.floor(Math.random() * ok.length)];
+  document.cookie = "variant=" + v + "; path=/; max-age=31536000; samesite=lax";
+  params.delete("v");
+  // Remember the outside site that sent them, since the redirect hides it.
+  try { if (document.referrer && new URL(document.referrer).host !== location.host) localStorage.setItem("ref", document.referrer); } catch (e) {}
+  var qs = params.toString();
+  location.replace("/" + v + (qs ? "?" + qs : ""));
+})();
+</script>
+</head>
+<body>
+<noscript><p style="padding:20px"><a href="/a">Continue</a></p></noscript>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "buildCommand": "node build.js",
+  "outputDirectory": "public",
+  "cleanUrls": true,
+  "headers": [
+    { "source": "/stats", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] }
+  ]
+}
