@@ -7,16 +7,23 @@
 <meta name="description" content="{{subline}}">
 <meta property="og:title" content="{{headline}}">
 <meta property="og:description" content="{{subline}}">
-<meta name="theme-color" content="#0a0a0a">
+<meta name="theme-color" content="#0b0b0b">
+<link rel="preload" href="/fonts/barlow-condensed-800-italic.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+  @font-face { font-family: "Barlow Condensed"; font-style: italic; font-weight: 800; font-display: swap; src: url(/fonts/barlow-condensed-800-italic.woff2) format("woff2"); }
+  @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 800; font-display: swap; src: url(/fonts/barlow-condensed-800.woff2) format("woff2"); }
+  @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 600; font-display: swap; src: url(/fonts/barlow-condensed-600.woff2) format("woff2"); }
   :root {
-    --bg: #0a0a0a;
-    --surface: #151515;
-    --line: #2a2a2a;
-    --text: #f4f4f2;
-    --muted: #9a9a96;
-    --accent: #c8ff2e;
-    --accent-ink: #0a0a0a;
+    --bg: #0b0b0b;
+    --surface: #141414;
+    --surface-2: #1b1b1b;
+    --line: #2b2b2b;
+    --text: #f2f0eb;
+    --muted: #9b9890;
+    --dim: #66645f;
+    --accent: #ff5418;
+    --accent-ink: #0b0b0b;
+    --cond: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bg); color: var(--text); }
@@ -25,84 +32,164 @@
     -webkit-font-smoothing: antialiased;
     min-height: 100vh; min-height: 100svh;
     display: flex; flex-direction: column;
-    padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+    padding: max(18px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom));
+    background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.018) 0 2px, transparent 2px 9px);
   }
-  .top { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
-  .mark { width: 14px; height: 14px; background: var(--accent); transform: skewX(-12deg); }
-  main { flex: 1; display: flex; flex-direction: column; justify-content: center; width: 100%; max-width: 560px; margin: 0 auto; padding: 28px 0 8px; }
-  .bar { width: 44px; height: 4px; background: var(--accent); margin-bottom: 18px; transform: skewX(-12deg); }
-  h1 { font-size: clamp(32px, 9vw, 54px); line-height: 1.02; letter-spacing: -.03em; font-weight: 800; margin: 0 0 14px; }
-  .sub { font-size: clamp(16px, 4.4vw, 19px); line-height: 1.45; color: var(--muted); margin: 0 0 26px; }
-  form { display: flex; flex-direction: column; gap: 14px; }
+  .top { display: flex; align-items: center; justify-content: space-between; font-family: var(--cond); font-size: 15px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .mark { width: 16px; height: 16px; background: var(--accent); transform: skewX(-14deg); }
+  .top .tag { color: var(--dim); font-weight: 600; letter-spacing: .1em; font-size: 13px; }
+
+  .wrap { flex: 1; width: 100%; max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; justify-content: center; padding: 22px 0 6px; }
+  .head, .act { max-width: 560px; }
+  h1 {
+    font-family: var(--cond); font-weight: 800; font-style: italic; text-transform: uppercase;
+    font-size: clamp(38px, 11vw, 74px); line-height: .92; letter-spacing: -.005em; margin: 0 0 14px;
+  }
+  .sub { font-size: clamp(15px, 4.2vw, 18px); line-height: 1.45; color: var(--muted); margin: 0 0 14px; }
+  .tags { list-style: none; padding: 0; margin: 0 0 18px; display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--cond); font-weight: 600; font-size: 14px; letter-spacing: .1em; text-transform: uppercase; color: var(--text); }
+  .tags li { display: flex; align-items: center; gap: 7px; }
+  .tags li::before { content: ""; width: 7px; height: 7px; background: var(--accent); transform: skewX(-14deg); }
+
+  /* App preview: plain card on phones, phone mockup on desktop */
+  .preview { margin: 0 0 20px; }
+  .screen { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent); padding: 12px 14px; font-size: 13px; }
+  .preview .more { display: none; }
+  .app-h { display: flex; justify-content: space-between; align-items: center; font-family: var(--cond); font-weight: 800; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .live { color: var(--accent); display: flex; align-items: center; gap: 6px; }
+  .live::before { content: ""; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+  .metric { display: grid; grid-template-columns: 58px 1fr 46px; align-items: center; gap: 10px; margin: 0 0 7px; color: var(--muted); }
+  .metric b { color: var(--text); text-align: right; font-family: var(--cond); font-size: 15px; font-weight: 800; }
+  .meter { height: 6px; background: var(--surface-2); }
+  .meter i { display: block; height: 100%; background: var(--text); }
+  .metric:nth-child(3) .meter i { background: var(--accent); }
+  .chart { display: flex; align-items: flex-end; gap: 6px; height: 64px; margin: 12px 0 4px; border-bottom: 1px solid var(--line); }
+  .chart i { flex: 1; background: #3a3a3a; }
+  .chart i.hot { background: var(--accent); }
+  .insight { margin: 9px 0 0; color: var(--muted); font-size: 12.5px; }
+  .insight b { color: var(--text); }
+  .rep-title { font-family: var(--cond); font-weight: 800; font-size: 22px; text-transform: uppercase; margin: 0 0 8px; line-height: 1; }
+  .steps { margin: 0 0 10px; padding: 0; list-style: none; counter-reset: s; }
+  .steps li { counter-increment: s; display: flex; gap: 10px; color: var(--muted); margin-bottom: 5px; }
+  .steps li::before { content: counter(s); font-family: var(--cond); font-weight: 800; width: 18px; height: 18px; flex: none; display: grid; place-content: center; border: 1px solid var(--line); color: var(--text); font-size: 12px; }
+  .steps li.done::before { content: "✓"; background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .streak { display: flex; align-items: center; gap: 10px; color: var(--muted); font-family: var(--cond); font-weight: 600; letter-spacing: .1em; text-transform: uppercase; font-size: 12px; }
+  .streak b { color: var(--text); font-size: 16px; font-weight: 800; }
+  .blocks { flex: 1; display: flex; gap: 3px; }
+  .blocks i { flex: 1; height: 10px; background: var(--text); transform: skewX(-14deg); }
+  .blocks i.now { background: var(--accent); }
+  .blocks i.off { background: var(--surface-2); }
+  .msg { background: var(--surface-2); color: var(--text); padding: 8px 11px; margin: 0 30px 6px 0; line-height: 1.35; }
+  .msg.me { background: var(--text); color: var(--accent-ink); margin: 0 0 6px 30px; font-weight: 500; }
+  .checkin { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; color: var(--muted); }
+  .checkin i { font-style: normal; width: 26px; height: 26px; flex: none; display: grid; place-content: center; background: var(--surface-2); color: var(--text); font-family: var(--cond); font-weight: 800; font-size: 14px; }
+  .checkin b { color: var(--text); margin-right: 4px; }
+  .checkin.you i { background: var(--accent); color: var(--accent-ink); }
+  .checkin.you div { color: var(--dim); }
+  .tabbar { justify-content: space-around; margin: auto -18px -26px; padding: 14px 0 18px; border-top: 1px solid var(--line); font-family: var(--cond); font-weight: 800; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+  .tabbar .on { color: var(--accent); }
+
+  form { display: flex; flex-direction: column; gap: 12px; }
+  /* On phones the optional questions open once the email field is tapped, so the button stays on the first screen. */
+  .optional { display: none; flex-direction: column; gap: 12px; }
+  form.open .optional { display: flex; }
   input[type=email] {
     width: 100%; font: inherit; font-size: 17px; color: var(--text);
-    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
-    padding: 15px 16px; outline: none;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 2px;
+    padding: 15px 14px; outline: none;
   }
   input[type=email]:focus { border-color: var(--accent); }
-  input[type=email]::placeholder { color: #666; }
-  .q { font-size: 13px; font-weight: 600; color: var(--muted); margin: 2px 0 8px; }
-  .q span { font-weight: 400; color: #666; }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  input[type=email]::placeholder { color: var(--dim); }
+  .q { font-family: var(--cond); font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 2px 0 8px; }
+  .q span { color: var(--dim); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip {
-    font: inherit; font-size: 14px; font-weight: 600; color: var(--text);
-    background: transparent; border: 1px solid var(--line); border-radius: 999px;
-    padding: 9px 14px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+    font-family: var(--cond); font-size: 15px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text);
+    background: transparent; border: 1px solid var(--line); border-radius: 2px;
+    padding: 7px 12px; cursor: pointer; -webkit-tap-highlight-color: transparent;
   }
-  .chip[aria-pressed=true] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-  .check { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--text); cursor: pointer; line-height: 1.35; }
-  .check input { appearance: none; -webkit-appearance: none; flex: none; width: 20px; height: 20px; margin: 0; border: 1px solid #555; border-radius: 5px; background: var(--surface); display: grid; place-content: center; cursor: pointer; }
+  .chip[aria-pressed=true] { background: var(--text); border-color: var(--text); color: var(--accent-ink); }
+  .check { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text); cursor: pointer; line-height: 1.35; }
+  .check input { appearance: none; -webkit-appearance: none; flex: none; width: 20px; height: 20px; margin: 0; border: 1px solid #555; border-radius: 0; background: var(--surface); display: grid; place-content: center; cursor: pointer; }
   .check input:checked { background: var(--accent); border-color: var(--accent); }
   .check input:checked::after { content: ""; width: 10px; height: 6px; border: solid var(--accent-ink); border-width: 0 0 2.5px 2.5px; transform: translateY(-1px) rotate(-45deg); }
   button[type=submit] {
-    font: inherit; font-size: 17px; font-weight: 800; letter-spacing: .01em;
-    color: var(--accent-ink); background: var(--accent); border: 0; border-radius: 10px;
-    padding: 16px; margin-top: 6px; cursor: pointer;
+    font-family: var(--cond); font-size: 21px; font-weight: 800; font-style: italic; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--accent-ink); background: var(--accent); border: 0; border-radius: 2px;
+    padding: 14px 16px; margin-top: 4px; cursor: pointer;
+    display: flex; justify-content: center; align-items: center; gap: 10px;
   }
+  button[type=submit]::after { content: "→"; font-style: normal; }
   button[type=submit]:disabled { opacity: .6; cursor: wait; }
-  .fine { font-size: 12px; color: #6f6f6b; text-align: center; margin: 2px 0 0; }
-  .err { font-size: 14px; color: #ff7a6b; margin: 0; display: none; }
+  .fine { font-size: 12px; color: var(--dim); text-align: center; margin: 0; }
+  .err { font-size: 14px; color: #ff8a6b; margin: 0; display: none; }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-  .thanks { display: none; }
-  .thanks h2 { font-size: 30px; font-weight: 800; letter-spacing: -.02em; margin: 0 0 8px; }
+  .thanks { display: none; border-left: 3px solid var(--accent); padding-left: 16px; }
+  .thanks h2 { font-family: var(--cond); font-style: italic; text-transform: uppercase; font-size: 40px; font-weight: 800; margin: 0 0 6px; line-height: 1; }
   .thanks p { color: var(--muted); font-size: 16px; line-height: 1.45; margin: 0; }
   .done form { display: none; }
   .done .thanks { display: block; }
-  @media (min-width: 700px) {
-    body { padding: 32px 40px; }
+
+  @media (min-width: 900px) {
+    body { padding: 32px 48px; }
+    .wrap { display: grid; grid-template-columns: minmax(0, 1fr) 340px; column-gap: 72px; align-content: center; }
+    .head { align-self: end; }
+    .act { align-self: start; }
+    .preview { grid-column: 2; grid-row: 1 / span 2; align-self: center; margin: 0; }
+    .preview .more { display: flex; }
+    .preview .metric.more { display: grid; }
+    .optional { display: flex; }
+    .phone { border: 1px solid #333; border-radius: 40px; padding: 12px; background: #0f0f0f; box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 6px #161616; transform: rotate(2deg); }
+    .phone::before { content: ""; display: block; width: 90px; height: 22px; background: #000; border-radius: 0 0 14px 14px; margin: -12px auto 10px; }
+    .screen { border: 0; border-radius: 28px; padding: 20px 18px 26px; min-height: 440px; font-size: 14px; display: flex; flex-direction: column; overflow: hidden; }
+    .chart { flex: none; }
+    .app-h { margin-bottom: 18px; }
+    .metric { margin-bottom: 12px; }
+    .msg { margin-bottom: 10px; }
+    .checkin { margin-bottom: 12px; }
+    .rep-title { font-size: 30px; margin-bottom: 16px; }
+    .steps li { margin-bottom: 10px; }
   }
 </style>
 </head>
 <body>
-<div class="top"><div class="mark"></div>{{brand}}</div>
-<main>
-  <div class="bar"></div>
-  <h1>{{headline}}</h1>
-  <p class="sub">{{subline}}</p>
-
-  <form id="f" novalidate>
-    <input type="email" name="email" placeholder="{{emailPlaceholder}}" autocomplete="email" inputmode="email" required aria-label="Email">
-
-    <div>
-      <p class="q">{{helpQuestion}} <span>(optional)</span></p>
-      <div class="chips">{{helpChips}}</div>
-    </div>
-
-    <label class="check"><input type="checkbox" name="chat"> {{chatCheckbox}}</label>
-    <label class="check"><input type="checkbox" name="invite"> {{inviteCheckbox}}</label>
-
-    <div class="hp" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
-
-    <p class="err" id="err"></p>
-    <button type="submit">{{button}}</button>
-    <p class="fine">{{finePrint}}</p>
-  </form>
-
-  <div class="thanks" role="status">
-    <h2>{{thanksTitle}}</h2>
-    <p>{{thanksText}}</p>
+<div class="top"><div class="brand"><div class="mark"></div>{{brand}}</div><div class="tag">Built for men</div></div>
+<div class="wrap">
+  <div class="head">
+    <h1>{{headline}}</h1>
+    <p class="sub">{{subline}}</p>
+    <ul class="tags">{{tags}}</ul>
   </div>
-</main>
+
+  <div class="preview" aria-hidden="true"><div class="phone"><div class="screen">{{preview}}</div></div></div>
+
+  <main class="act">
+    <form id="f" novalidate>
+      <input type="email" name="email" placeholder="{{emailPlaceholder}}" autocomplete="email" inputmode="email" required aria-label="Email">
+
+      <div class="optional">
+      <div>
+        <p class="q">{{helpQuestion}} <span>(optional)</span></p>
+        <div class="chips">{{helpChips}}</div>
+      </div>
+
+      <label class="check"><input type="checkbox" name="chat"> {{chatCheckbox}}</label>
+      <label class="check"><input type="checkbox" name="invite"> {{inviteCheckbox}}</label>
+      </div>
+
+      <div class="hp" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
+
+      <p class="err" id="err"></p>
+      <button type="submit">{{button}}</button>
+      <p class="fine">{{finePrint}}</p>
+    </form>
+
+    <div class="thanks" role="status">
+      <h2>{{thanksTitle}}</h2>
+      <p>{{thanksText}}</p>
+    </div>
+  </main>
+</div>
 
 <script>
 (function () {
@@ -165,6 +252,9 @@
   });
 
   var form = document.getElementById("f");
+  function openForm() { form.classList.add("open"); }
+  form.email.addEventListener("focus", openForm);
+  form.email.addEventListener("input", openForm);
   var err = document.getElementById("err");
   var btn = form.querySelector("button[type=submit]");
   function showErr(msg) { err.textContent = msg; err.style.display = "block"; }

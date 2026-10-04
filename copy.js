@@ -19,27 +19,32 @@ module.exports = {
   thanksTitle: "You're in.",
   thanksText: "We'll email you when it's ready. Nothing before that.",
 
-  // The four variants. Only the headline and subline differ.
+  // The four variants. Headline, subline and the short tags line differ.
+  // The little app preview for each variant lives in src/previews/a.html, b.html, etc.
   variants: {
     a: {
       name: "Training log",
       headline: "Train your head like you train your body.",
       subline: "Track mood, stress, and sleep next to your workouts. See what actually moves the needle.",
+      tags: ["Mood", "Stress", "Sleep", "Training"],
     },
     b: {
       name: "Tactical",
       headline: "Emotional intelligence is a skill. Here's the playbook.",
       subline: "Short daily reps that make you better under pressure, in relationships, and at work.",
+      tags: ["5-min daily reps", "Pressure", "Relationships", "Work"],
     },
     c: {
       name: "Anonymous",
       headline: "Talk it out. Nobody has to know.",
       subline: "Anonymous, judgment-free space built for guys who'd never post about this.",
+      tags: ["100% anonymous", "No real names", "No judgment"],
     },
     d: {
       name: "Locker room",
       headline: "The group chat, but for the stuff you don't say in the group chat.",
       subline: "Private check-ins with the friends you pick. No feed, no followers.",
+      tags: ["Friends you pick", "No feed", "No followers"],
     },
   },
 };

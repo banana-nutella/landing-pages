@@ -49,12 +49,16 @@ Use lowercase and no spaces. Stats are grouped by `utm_source`, and the full UTM
 
 ## How to change the headline copy
 
-All the words on the site live in one file: **`copy.js`**.
+All the words on the site live in one file: **`copy.js`**. That covers headlines, sublines, the short tag line under each subline (e.g. "MOOD · STRESS · SLEEP"), the button, and the form questions.
 
 1. On GitHub, open the repo → click `copy.js` → click the **pencil icon** (Edit) at the top right.
 2. Change the text **between the quotes**. Keep the quotes and commas.
 3. Click **Commit changes…** → **Commit changes**.
 4. Vercel redeploys automatically. The change is live in about a minute.
+
+The small app preview on each variant (the stats card, chat bubbles, etc.) is in `src/previews/a.html`, `b.html`, `c.html`, `d.html`. The words in there can be edited the same way. Only change text between `>` and `<`.
+
+The "Built for men" label in the top-right corner is in `src/page.html` (search for it).
 
 Changing copy mid-test resets what you're measuring for that variant. To do it cleanly, write down the current numbers, then clear that variant's rows in both tabs of the sheet.
 
@@ -93,7 +97,8 @@ Project → **Settings → Environment Variables**:
 After changing any of them: **Deployments** tab → **⋯** on the top deployment → **Redeploy**.
 
 ### How it works (for whoever touches this next)
-- Plain HTML, no framework. `node build.js` turns `src/page.html` + `copy.js` into `public/a.html` … `d.html`. Vercel runs it on every push.
+- Plain HTML, no framework. `node build.js` turns `src/page.html` + `copy.js` + `src/previews/*.html` into `public/a.html` … `d.html`. Vercel runs it on every push. The font (Barlow Condensed) is self-hosted in `src/fonts/`.
+- On phones, the optional questions open when the email field is tapped, so the button stays on the first screen.
 - `src/index.html` assigns the variant (cookie `variant`) and redirects, keeping the query string.
 - Each variant page logs one visit per visitor per variant (cookie `vid` + `seen_X`) to `/api/visit`. Signups go to `/api/signup`. Both forward to the Apps Script, which appends rows.
 - `/api/stats` checks `STATS_PASSWORD` and asks the Apps Script to compute counts from the sheet.

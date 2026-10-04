@@ -19,7 +19,9 @@ const helpChips = copy.helpOptions
 for (const [id, v] of Object.entries(copy.variants)) {
   const vars = {};
   for (const [k, val] of Object.entries(copy)) if (typeof val === "string") vars[k] = esc(val);
-  Object.assign(vars, { headline: esc(v.headline), subline: esc(v.subline), variant: id, helpChips });
+  const tags = (v.tags || []).map((t) => `<li>${esc(t)}</li>`).join("");
+  const preview = fs.readFileSync(path.join(__dirname, `src/previews/${id}.html`), "utf8");
+  Object.assign(vars, { headline: esc(v.headline), subline: esc(v.subline), variant: id, helpChips, tags, preview });
   fs.writeFileSync(path.join(out, `${id}.html`), fill(page, vars));
 }
 
@@ -31,5 +33,6 @@ fs.writeFileSync(
   })
 );
 fs.copyFileSync(path.join(__dirname, "src/index.html"), path.join(out, "index.html"));
+fs.cpSync(path.join(__dirname, "src/fonts"), path.join(out, "fonts"), { recursive: true });
 
 console.log("Built variants:", Object.keys(copy.variants).join(", "));
