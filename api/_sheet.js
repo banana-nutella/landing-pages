@@ -11,7 +11,18 @@ function parseBody(req) {
   return b && typeof b === "object" ? b : {};
 }
 
+// Google occasionally answers with an error page even though the row was saved,
+// so try once more before giving up. Stats ignore duplicate rows.
 async function callSheet(data) {
+  try {
+    return await callSheetOnce(data);
+  } catch (e) {
+    console.warn("Sheet call failed, retrying once:", e.message.slice(0, 200));
+    return await callSheetOnce(data);
+  }
+}
+
+async function callSheetOnce(data) {
   if (!process.env.SHEET_URL) throw new Error("SHEET_URL is not set");
   const r = await fetch(process.env.SHEET_URL, {
     method: "POST",
