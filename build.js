@@ -32,7 +32,10 @@ fs.writeFileSync(
     variantNames: JSON.stringify(names).replace(/</g, "\\u003c"),
   })
 );
-fs.copyFileSync(path.join(__dirname, "src/index.html"), path.join(out, "index.html"));
+fs.writeFileSync(
+  path.join(out, "index.html"),
+  fill(fs.readFileSync(path.join(__dirname, "src/index.html"), "utf8"), { variantIds: JSON.stringify(Object.keys(copy.variants)) })
+);
 fs.cpSync(path.join(__dirname, "src/fonts"), path.join(out, "fonts"), { recursive: true });
 
 console.log("Built variants:", Object.keys(copy.variants).join(", "));

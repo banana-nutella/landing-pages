@@ -3,6 +3,21 @@
   "outputDirectory": "public",
   "cleanUrls": true,
   "headers": [
-    { "source": "/stats", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] }
+    {
+      "source": "/stats",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/d",
+      "destination": "/",
+      "permanent": false
+    }
   ]
 }

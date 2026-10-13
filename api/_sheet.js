@@ -1,7 +1,7 @@
 // Sends data to / reads data from the Google Sheet (via its Apps Script web app).
 // SHEET_URL and SHEET_SECRET are set in Vercel → Project → Settings → Environment Variables.
 const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
-const VARIANTS = ["a", "b", "c", "d"];
+const VARIANTS = Object.keys(require("../copy.js").variants);
 
 const clean = (v, max = 200) => String(v == null ? "" : v).slice(0, max);
 

@@ -8,9 +8,9 @@
 <style>html, body { margin: 0; background: #0a0a0a; color: #f4f4f2; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; } a { color: #c8ff2e; }</style>
 <script>
 // Pick a variant for this visitor (or reuse the one they already got) and send them there.
-// ?v=a|b|c|d forces a specific variant. All other URL params (UTMs) are kept.
+// ?v=a, ?v=b, ... forces a specific variant. All other URL params (UTMs) are kept.
 (function () {
-  var ok = ["a", "b", "c", "d"];
+  var ok = {{variantIds}}; // filled in from copy.js by build.js
   var params = new URLSearchParams(location.search);
   var m = document.cookie.match("(?:^|; )variant=([^;]*)");
   var v = params.get("v");

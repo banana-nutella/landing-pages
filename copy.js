@@ -19,8 +19,9 @@ module.exports = {
   thanksTitle: "You're in.",
   thanksText: "We'll email you when it's ready. Nothing before that.",
 
-  // The four variants. Headline, subline and the short tags line differ.
+  // The variants. Headline, subline and the short tags line differ.
   // The little app preview for each variant lives in src/previews/a.html, b.html, etc.
+  // Deleting a block here removes that variant everywhere (pages, random split, stats).
   variants: {
     a: {
       name: "Training log",
@@ -39,12 +40,6 @@ module.exports = {
       headline: "Talk it out. Nobody has to know.",
       subline: "Anonymous, judgment-free space built for guys who'd never post about this.",
       tags: ["100% anonymous", "No real names", "No judgment"],
-    },
-    d: {
-      name: "Locker room",
-      headline: "The group chat, but for the stuff you don't say in the group chat.",
-      subline: "Private check-ins with the friends you pick. No feed, no followers.",
-      tags: ["Friends you pick", "No feed", "No followers"],
     },
   },
 };
