@@ -55,6 +55,13 @@
     <tbody id="sources"></tbody>
   </table></div>
   <p class="note">Source = the utm_source in the link. "(none)" = visitors whose link had no utm_source. Visitors are unique people; each is counted once per variant.</p>
+
+  <h2>Early app (/app)</h2>
+  <div class="wrap"><table>
+    <thead><tr><th>Metric</th><th>People</th><th>% of app users</th></tr></thead>
+    <tbody id="app"></tbody>
+  </table></div>
+  <p class="note" id="appNote">The real test: do people come back? "Came back" = checked in on 2+ different days. "Still going" = checked in on day 7 or later. If the app numbers stay at 0 after people use it, the Google Sheet script needs updating (see README).</p>
 </div>
 
 <script>
@@ -108,6 +115,17 @@ function render(d) {
   document.getElementById("sources").innerHTML = src.length ? src.map(function (s) {
     return '<tr><td>' + esc(s.source || "(none)") + '</td><td>' + esc(String(s.variant).toUpperCase()) + '</td><td>' + s.visitors + '</td><td>' + s.signups + '</td><td>' + pct(s.signups, s.visitors) + '</td></tr>';
   }).join("") : '<tr><td colspan="5" class="small">No data yet.</td></tr>';
+
+  var a = d.app || { users: 0, checkedIn: 0, twoPlusDays: 0, weekPlus: 0, checkins: 0, reps: 0, byVariant: {} };
+  var arows = [["Opened the app", a.users], ["Did a check-in", a.checkedIn], ["Came back (2+ days)", a.twoPlusDays], ["Still going (day 7+)", a.weekPlus]];
+  var ahtml = arows.map(function (r) { return "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td><td>" + pct(r[1], a.users) + "</td></tr>"; }).join("");
+  Object.keys(a.byVariant || {}).sort().forEach(function (v) {
+    var b = a.byVariant[v];
+    if (!NAMES[v]) return;
+    ahtml += '<tr><td><span class="small">Came from variant</span> ' + esc(v.toUpperCase()) + "</td><td>" + b.twoPlusDays + " of " + b.users + "</td><td>" + pct(b.twoPlusDays, b.users) + "</td></tr>";
+  });
+  ahtml += '<tr><td class="small">Total check-ins / reps done</td><td colspan="2">' + a.checkins + " / " + a.reps + "</td></tr>";
+  document.getElementById("app").innerHTML = ahtml;
 }
 
 document.getElementById("f").addEventListener("submit", function (e) { e.preventDefault(); load(document.getElementById("pw").value); });

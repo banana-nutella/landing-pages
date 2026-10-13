@@ -18,6 +18,7 @@ module.exports = {
   inviteCheckbox: "Would you invite 1-2 friends when it launches?",
   thanksTitle: "You're in.",
   thanksText: "We'll email you when it's ready. Nothing before that.",
+  thanksLink: "Want in now? Try the early version",
 
   // The variants. Headline, subline and the short tags line differ.
   // The little app preview for each variant lives in src/previews/a.html, b.html, etc.

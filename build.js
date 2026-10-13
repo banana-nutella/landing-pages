@@ -25,6 +25,14 @@ for (const [id, v] of Object.entries(copy.variants)) {
   fs.writeFileSync(path.join(out, `${id}.html`), fill(page, vars));
 }
 
+const appContent = require("./app-content.js");
+fs.writeFileSync(
+  path.join(out, "app.html"),
+  fill(fs.readFileSync(path.join(__dirname, "src/app.html"), "utf8"), {
+    appContent: JSON.stringify(appContent).replace(/</g, "\\u003c"),
+  })
+);
+
 const names = Object.fromEntries(Object.entries(copy.variants).map(([id, v]) => [id, v.name]));
 fs.writeFileSync(
   path.join(out, "stats.html"),

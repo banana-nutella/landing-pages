@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Early access app</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b0b0b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preload" href="/fonts/barlow-condensed-800.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+  @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 800; font-display: swap; src: url(/fonts/barlow-condensed-800.woff2) format("woff2"); }
+  @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 600; font-display: swap; src: url(/fonts/barlow-condensed-600.woff2) format("woff2"); }
+  :root {
+    --bg: #0b0b0b; --surface: #141414; --surface-2: #1d1d1d; --line: #2b2b2b;
+    --text: #f2f0eb; --muted: #9b9890; --dim: #66645f;
+    --accent: #ffb020; --accent-ink: #0b0b0b; --warn: #ff8a6b;
+    --cond: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased; font-size: 15px; line-height: 1.4;
+    padding: max(16px, env(safe-area-inset-top)) 16px calc(84px + env(safe-area-inset-bottom));
+  }
+  main { max-width: 520px; margin: 0 auto; }
+  .view { display: none; }
+  .view.on { display: block; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+
+  .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .brand { display: flex; align-items: center; gap: 9px; font-family: var(--cond); font-weight: 800; font-size: 15px; letter-spacing: .12em; text-transform: uppercase; }
+  .mark { width: 14px; height: 14px; background: var(--accent); transform: skewX(-14deg); }
+  .pill { font-family: var(--cond); font-weight: 800; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+
+  h1 { font-family: var(--cond); font-weight: 800; text-transform: uppercase; font-size: 40px; line-height: .95; margin: 0 0 6px; }
+  h2 { font-family: var(--cond); font-weight: 800; text-transform: uppercase; font-size: 15px; letter-spacing: .12em; color: var(--muted); margin: 0 0 12px; }
+  .sub { color: var(--muted); margin: 0 0 18px; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+  .card.warn { border-color: var(--warn); }
+  .card.warn p { margin: 0; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+  /* Check-in form */
+  .field { margin-bottom: 16px; }
+  .field label, .label { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 8px; }
+  .field label b { font-family: var(--cond); font-size: 20px; color: var(--accent); }
+  .hint { font-weight: 400; color: var(--dim); font-size: 12px; }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 30px; background: transparent; margin: 0; }
+  input[type=range]::-webkit-slider-runnable-track { height: 6px; background: var(--surface-2); border-radius: 3px; }
+  input[type=range]::-moz-range-track { height: 6px; background: var(--surface-2); border-radius: 3px; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%; background: var(--text); margin-top: -10px; border: 0; }
+  input[type=range]::-moz-range-thumb { width: 26px; height: 26px; border-radius: 50%; background: var(--text); border: 0; }
+  .ends { display: flex; justify-content: space-between; font-size: 12px; color: var(--dim); }
+  .stepper { display: flex; align-items: center; gap: 12px; }
+  .stepper button { width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); font-size: 22px; }
+  .stepper b { font-family: var(--cond); font-size: 26px; min-width: 70px; text-align: center; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-size: 14px; font-weight: 600; background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 9px 13px; }
+  .chip[aria-pressed=true] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  input[type=text] { width: 100%; font: inherit; color: var(--text); background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 12px; outline: none; }
+  input[type=text]:focus { border-color: var(--accent); }
+  .btn { display: block; width: 100%; font-family: var(--cond); font-weight: 800; font-size: 19px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-ink); background: var(--accent); border: 0; border-radius: 10px; padding: 14px; }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  .btn.small { display: inline-block; width: auto; font-size: 15px; padding: 9px 14px; }
+  .link { background: none; border: 0; color: var(--muted); text-decoration: underline; padding: 0; font-size: 14px; }
+
+  /* Today summary */
+  .stats3 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; }
+  .stats3 div { background: var(--surface-2); border-radius: 8px; padding: 10px 4px; }
+  .stats3 b { display: block; font-family: var(--cond); font-size: 24px; line-height: 1; }
+  .stats3 span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+
+  /* Rep */
+  .rep-title { font-family: var(--cond); font-weight: 800; text-transform: uppercase; font-size: 26px; line-height: 1; margin: 0 0 8px; }
+  .why { color: var(--muted); margin: 0 0 12px; }
+  ol.steps { margin: 0 0 16px; padding: 0; list-style: none; counter-reset: s; }
+  ol.steps li { counter-increment: s; display: flex; gap: 10px; margin-bottom: 9px; }
+  ol.steps li::before { content: counter(s); flex: none; width: 22px; height: 22px; border-radius: 6px; display: grid; place-content: center; background: var(--surface-2); font-family: var(--cond); font-weight: 800; font-size: 14px; }
+  .done-badge { color: var(--accent); font-family: var(--cond); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+
+  /* Trends */
+  .chart { display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; align-items: end; height: 70px; margin-bottom: 4px; }
+  .chart i { display: block; background: var(--surface-2); border-radius: 3px 3px 0 0; min-height: 2px; }
+  .chart i.v { background: var(--text); }
+  .chart.mood i.v { background: var(--accent); }
+  .chart-days { display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; font-size: 10px; color: var(--dim); text-align: center; margin-bottom: 16px; }
+  .chart-days span.t { color: var(--accent); }
+  .pattern { padding: 12px 0; border-top: 1px solid var(--line); }
+  .pattern:first-of-type { border-top: 0; padding-top: 0; }
+  .pattern b { color: var(--accent); }
+
+  /* Playbook */
+  .rep-item { width: 100%; text-align: left; background: none; border: 0; padding: 14px 0; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .rep-item:first-child { border-top: 0; padding-top: 0; }
+  .rep-item strong { font-family: var(--cond); font-weight: 800; text-transform: uppercase; font-size: 19px; }
+  .rep-item small { color: var(--dim); white-space: nowrap; }
+  .rep-body { padding-bottom: 12px; }
+
+  .crisis { font-size: 12px; color: var(--dim); text-align: center; margin: 22px 0 0; }
+  .crisis a { color: var(--muted); }
+
+  /* Tab bar */
+  nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: rgba(11,11,11,.96); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); backdrop-filter: blur(8px); }
+  nav.tabs button { flex: 1; background: none; border: 0; padding: 14px 0 16px; font-family: var(--cond); font-weight: 800; font-size: 15px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+  nav.tabs button.on { color: var(--accent); }
+  body.onboarding nav.tabs { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><div class="brand"><div class="mark"></div>Early access</div><div class="pill" id="streakPill"></div></div>
+
+  <!-- First open -->
+  <section class="view" id="v-onboard">
+    <h1>Let's set you up.</h1>
+    <p class="sub">Two minutes a day: a quick check-in and one short rep. Everything stays on this phone. No account, no name.</p>
+    <div class="card">
+      <div class="label">What do you want to work on most?</div>
+      <div class="chips" id="goalChips"></div>
+    </div>
+    <button class="btn" id="startBtn">Start day 1</button>
+  </section>
+
+  <!-- Today -->
+  <section class="view" id="v-today">
+    <h1 id="dayTitle">Day 1</h1>
+    <p class="sub" id="todaySub">Log how you're doing, then do today's rep.</p>
+
+    <div class="card warn" id="lowCard" hidden><p><b>Rough day.</b> That's worth taking seriously. Talk to someone you trust today. <span id="lowCrisis"></span></p></div>
+
+    <div class="card" id="checkinForm">
+      <h2>Check-in</h2>
+      <div class="field"><label for="mood">Mood <b id="moodVal">5</b></label><input type="range" id="mood" min="1" max="10" value="5"><div class="ends"><span>Awful</span><span>Great</span></div></div>
+      <div class="field"><label for="stress">Stress <b id="stressVal">5</b></label><input type="range" id="stress" min="1" max="10" value="5"><div class="ends"><span>Calm</span><span>Maxed out</span></div></div>
+      <div class="field"><div class="label">Sleep last night</div><div class="stepper"><button type="button" id="sleepMinus" aria-label="Less sleep">−</button><b id="sleepVal">7h</b><button type="button" id="sleepPlus" aria-label="More sleep">+</button></div></div>
+      <div class="field"><div class="label">Training today</div><div class="chips" id="trainChips"></div></div>
+      <div class="field"><div class="label">Anything on your mind? <span class="hint">optional, stays on this phone</span></div><input type="text" id="note" maxlength="140" placeholder="One line"></div>
+      <button class="btn" id="saveBtn">Log it</button>
+    </div>
+
+    <div class="card" id="checkinDone" hidden>
+      <div class="row" style="margin-bottom:12px"><h2 style="margin:0">Today's check-in</h2><button class="link" id="editBtn">Edit</button></div>
+      <div class="stats3" id="todayStats"></div>
+    </div>
+
+    <div class="card" id="repCard">
+      <div class="row" style="margin-bottom:10px"><h2 style="margin:0" id="repLabel">Today's rep</h2><span class="hint" id="repMins"></span></div>
+      <p class="rep-title" id="repTitle"></p>
+      <p class="why" id="repWhy"></p>
+      <ol class="steps" id="repSteps"></ol>
+      <button class="btn" id="repBtn">Done</button>
+      <p class="done-badge" id="repDone" hidden>Rep done. See you tomorrow.</p>
+    </div>
+    <p class="crisis" data-crisis></p>
+  </section>
+
+  <!-- Trends -->
+  <section class="view" id="v-trends">
+    <h1>Trends</h1>
+    <p class="sub">Your last 14 days. Highlighted dates are training days.</p>
+    <div id="trendsEmpty" class="card" hidden><p style="margin:0">Log your first check-in and your trends start here.</p></div>
+    <div id="trendsBody">
+      <div class="card">
+        <h2>Mood</h2><div class="chart mood" id="chMood"></div><div class="chart-days" data-days></div>
+        <h2>Stress</h2><div class="chart" id="chStress"></div><div class="chart-days" data-days></div>
+        <h2>Sleep</h2><div class="chart" id="chSleep"></div><div class="chart-days" data-days></div>
+      </div>
+      <div class="card"><h2>Patterns</h2><div id="patterns"></div></div>
+      <div class="card"><h2>Totals</h2><div class="stats3" id="totals"></div></div>
+    </div>
+    <div class="card">
+      <h2>Your data</h2>
+      <p class="sub" style="margin-bottom:12px">It's only stored on this phone. Clearing your browser data deletes it.</p>
+      <button class="btn ghost small" id="exportBtn">Download my data</button>
+      <button class="btn ghost small" id="wipeBtn">Delete everything</button>
+    </div>
+    <p class="crisis" data-crisis></p>
+  </section>
+
+  <!-- Playbook -->
+  <section class="view" id="v-reps">
+    <h1>Playbook</h1>
+    <p class="sub">Every rep in the program. You get a new one each day, or try any of them now.</p>
+    <div class="card" id="repList"></div>
+    <p class="crisis" data-crisis></p>
+  </section>
+</main>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="today" class="on">Today</button>
+  <button data-tab="trends">Trends</button>
+  <button data-tab="reps">Playbook</button>
+</nav>
+
+<script>
+(function () {
+  var CONTENT = {{appContent}};
+  var GOALS = ["Stress", "Anger", "Relationships", "Feeling stuck", "Sleep", "Focus"];
+  var TRAIN = [["rest", "Rest day"], ["lift", "Lift"], ["cardio", "Cardio"], ["sport", "Sport"], ["other", "Other"]];
+  var KEY = "app_v1";
+
+  // ---------- storage ----------
+  function load() { try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  var S = load();
+
+  // ---------- dates ----------
+  function dstr(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function parse(s) { var p = s.split("-"); return new Date(+p[0], p[1] - 1, +p[2]); }
+  function addDays(s, n) { var d = parse(s); d.setDate(d.getDate() + n); return dstr(d); }
+  function diffDays(a, b) { return Math.round((parse(b) - parse(a)) / 86400000); }
+  var TODAY = dstr(new Date());
+  function appDay() { return S ? diffDays(S.created, TODAY) + 1 : 1; }
+
+  // ---------- anonymous usage events (no notes, no numbers, just "what happened") ----------
+  function cookie(n) { var m = document.cookie.match("(?:^|; )" + n + "=([^;]*)"); return m ? decodeURIComponent(m[1]) : ""; }
+  var vid = cookie("vid");
+  if (!vid) { vid = Date.now().toString(36) + Math.random().toString(36).slice(2, 10); }
+  document.cookie = "vid=" + vid + "; path=/; max-age=31536000; samesite=lax";
+  var notrack = false; try { notrack = !!localStorage.getItem("notrack"); } catch (e) {}
+  if (new URLSearchParams(location.search).get("notrack") === "1") { notrack = true; try { localStorage.setItem("notrack", "1"); } catch (e) {} }
+  function track(event) {
+    if (notrack) return;
+    var body = JSON.stringify({ event: event, vid: vid, variant: cookie("variant"), app_day: appDay(), goal: S ? S.goal : "" });
+    try { if (navigator.sendBeacon && navigator.sendBeacon("/api/event", new Blob([body], { type: "application/json" }))) return; } catch (e) {}
+    fetch("/api/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: body, keepalive: true }).catch(function () {});
+  }
+
+  // ---------- helpers ----------
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function chips(el, items, selected, onPick) {
+    el.innerHTML = items.map(function (it) {
+      var v = Array.isArray(it) ? it[0] : it, l = Array.isArray(it) ? it[1] : it;
+      return '<button type="button" class="chip" data-v="' + esc(v) + '" aria-pressed="' + (v === selected) + '">' + esc(l) + "</button>";
+    }).join("");
+    el.onclick = function (e) {
+      var b = e.target.closest(".chip"); if (!b) return;
+      el.querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c === b ? "true" : "false"); });
+      onPick(b.getAttribute("data-v"));
+    };
+  }
+  function day(s) { return S.days[s] || (S.days[s] = {}); }
+  function checkedIn(s) { return S.days[s] && S.days[s].mood != null; }
+  function streak() {
+    var s = checkedIn(TODAY) ? TODAY : addDays(TODAY, -1), n = 0;
+    while (checkedIn(s)) { n++; s = addDays(s, -1); }
+    return n;
+  }
+  function bestStreak() {
+    var keys = Object.keys(S.days).filter(checkedIn).sort(), best = 0, run = 0, prev = null;
+    keys.forEach(function (k) { run = prev && diffDays(prev, k) === 1 ? run + 1 : 1; best = Math.max(best, run); prev = k; });
+    return best;
+  }
+  function repFor(n) { return CONTENT.reps[(n - 1) % CONTENT.reps.length]; }
+  function avg(a) { return a.reduce(function (x, y) { return x + y; }, 0) / a.length; }
+  function fmt(n) { return (Math.round(n * 10) / 10).toFixed(1).replace(/\.0$/, ""); }
+  function sleepLabel(h) { return (h % 1 ? Math.floor(h) + "h 30" : h + "h"); }
+
+  document.querySelectorAll("[data-crisis]").forEach(function (el) { el.textContent = CONTENT.crisisLine; });
+  $("lowCrisis").textContent = CONTENT.crisisLine;
+
+  // ---------- onboarding ----------
+  var pickedGoal = "";
+  function showOnboard() {
+    document.body.classList.add("onboarding");
+    chips($("goalChips"), GOALS, "", function (v) { pickedGoal = v; });
+    show("onboard");
+  }
+  $("startBtn").onclick = function () {
+    S = { goal: pickedGoal, created: TODAY, days: {} };
+    save();
+    document.body.classList.remove("onboarding");
+    track("onboard");
+    track("open");
+    try { localStorage.setItem("app_last_open", TODAY); } catch (e) {}
+    fillForm(); render(); show("today");
+  };
+
+  // ---------- today ----------
+  var form = { mood: 5, stress: 5, sleep: 7, train: "" };
+  function fillForm() {
+    var d = S.days[TODAY] || {};
+    form = { mood: d.mood || 5, stress: d.stress || 5, sleep: d.sleep != null ? d.sleep : 7, train: d.train || "" };
+    $("mood").value = form.mood; $("moodVal").textContent = form.mood;
+    $("stress").value = form.stress; $("stressVal").textContent = form.stress;
+    $("sleepVal").textContent = sleepLabel(form.sleep);
+    $("note").value = d.note || "";
+    chips($("trainChips"), TRAIN, form.train, function (v) { form.train = v; });
+  }
+  $("mood").oninput = function () { form.mood = +this.value; $("moodVal").textContent = this.value; };
+  $("stress").oninput = function () { form.stress = +this.value; $("stressVal").textContent = this.value; };
+  $("sleepMinus").onclick = function () { form.sleep = Math.max(0, form.sleep - 0.5); $("sleepVal").textContent = sleepLabel(form.sleep); };
+  $("sleepPlus").onclick = function () { form.sleep = Math.min(14, form.sleep + 0.5); $("sleepVal").textContent = sleepLabel(form.sleep); };
+  $("saveBtn").onclick = function () {
+    var first = !checkedIn(TODAY);
+    var d = day(TODAY);
+    d.mood = form.mood; d.stress = form.stress; d.sleep = form.sleep; d.train = form.train || "rest";
+    d.note = $("note").value.trim().slice(0, 140);
+    save();
+    if (first) track("checkin");
+    editing = false;
+    render();
+  };
+  var editing = false;
+  $("editBtn").onclick = function () { editing = true; fillForm(); render(); };
+
+  var previewRep = null; // a rep picked from the playbook, shown in place of today's
+  $("repBtn").onclick = function () {
+    var rep = previewRep || repFor(appDay());
+    var d = day(TODAY);
+    d.reps = d.reps || [];
+    if (d.reps.indexOf(rep.id) < 0) d.reps.push(rep.id);
+    save();
+    track("rep_done");
+    render();
+  };
+
+  function renderToday() {
+    var n = appDay(), done = checkedIn(TODAY), d = S.days[TODAY] || {};
+    $("dayTitle").textContent = "Day " + n;
+    $("todaySub").textContent = !done ? "Log how you're doing, then do today's rep." : d.mood <= 3 ? "Checked in. Showing up on a bad day counts." : "Checked in. Nice.";
+    $("checkinForm").hidden = done && !editing;
+    $("checkinDone").hidden = !done || editing;
+    $("lowCard").hidden = !(done && d.mood <= 2);
+    if (done) {
+      var t = TRAIN.filter(function (x) { return x[0] === d.train; })[0];
+      $("todayStats").innerHTML =
+        "<div><b>" + d.mood + "</b><span>Mood</span></div>" +
+        "<div><b>" + d.stress + "</b><span>Stress</span></div>" +
+        "<div><b>" + sleepLabel(d.sleep) + "</b><span>Sleep</span></div>" +
+        "<div><b style='font-size:17px;line-height:24px'>" + esc(t ? t[1] : "Rest") + "</b><span>Training</span></div>";
+    }
+    var rep = previewRep || repFor(n), repDone = (d.reps || []).indexOf(rep.id) >= 0;
+    $("repLabel").textContent = previewRep ? "Playbook rep" : "Today's rep";
+    $("repMins").textContent = rep.minutes + " min";
+    $("repTitle").textContent = rep.title;
+    $("repWhy").textContent = rep.why;
+    $("repSteps").innerHTML = rep.steps.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("");
+    $("repBtn").hidden = repDone;
+    $("repDone").hidden = !repDone;
+    var st = streak();
+    $("streakPill").textContent = st ? "Streak " + st : "";
+  }
+
+  // ---------- trends ----------
+  function bars(el, key, max) {
+    var html = "";
+    for (var i = 13; i >= 0; i--) {
+      var d = S.days[addDays(TODAY, -i)], v = d && d.mood != null ? d[key] : null;
+      html += v == null ? "<i></i>" : '<i class="v" style="height:' + Math.max(4, (v / max) * 100) + '%" title="' + v + '"></i>';
+    }
+    el.innerHTML = html;
+  }
+  function renderTrends() {
+    var logged = Object.keys(S.days).filter(checkedIn);
+    $("trendsEmpty").hidden = logged.length > 0;
+    $("trendsBody").hidden = logged.length === 0;
+    if (!logged.length) return;
+    bars($("chMood"), "mood", 10); bars($("chStress"), "stress", 10); bars($("chSleep"), "sleep", 10);
+    var days = "";
+    for (var i = 13; i >= 0; i--) {
+      var s = addDays(TODAY, -i), d = S.days[s];
+      days += '<span class="' + (d && d.train && d.train !== "rest" ? "t" : "") + '">' + parse(s).getDate() + "</span>";
+    }
+    document.querySelectorAll("[data-days]").forEach(function (el) { el.innerHTML = days; });
+
+    var all = logged.map(function (k) { return S.days[k]; });
+    var trainD = all.filter(function (d) { return d.train && d.train !== "rest"; }), restD = all.filter(function (d) { return d.train === "rest"; });
+    var goodSleep = all.filter(function (d) { return d.sleep >= 7; }), badSleep = all.filter(function (d) { return d.sleep < 7; });
+    var p = [];
+    if (trainD.length >= 3 && restD.length >= 3) {
+      var a = avg(trainD.map(function (d) { return d.stress; })), b = avg(restD.map(function (d) { return d.stress; }));
+      p.push("Stress averages <b>" + fmt(a) + "</b> on training days vs <b>" + fmt(b) + "</b> on rest days.");
+    }
+    if (goodSleep.length >= 3 && badSleep.length >= 3) {
+      var c = avg(goodSleep.map(function (d) { return d.mood; })), e = avg(badSleep.map(function (d) { return d.mood; }));
+      p.push("Mood averages <b>" + fmt(c) + "</b> after 7h+ of sleep vs <b>" + fmt(e) + "</b> after less.");
+    }
+    if (all.length >= 3) p.push("Average mood so far: <b>" + fmt(avg(all.map(function (d) { return d.mood; }))) + "</b>. Average stress: <b>" + fmt(avg(all.map(function (d) { return d.stress; }))) + "</b>.");
+    if (p.length < 2) p.push("More patterns unlock once you have at least 3 training days, 3 rest days, and a mix of good and bad sleep.");
+    $("patterns").innerHTML = p.map(function (x) { return '<p class="pattern" style="margin:0">' + x + "</p>"; }).join("");
+
+    var repsDone = Object.keys(S.days).reduce(function (n, k) { return n + ((S.days[k].reps || []).length); }, 0);
+    $("totals").innerHTML =
+      "<div><b>" + logged.length + "</b><span>Check-ins</span></div>" +
+      "<div><b>" + repsDone + "</b><span>Reps</span></div>" +
+      "<div><b>" + streak() + "</b><span>Streak</span></div>" +
+      "<div><b>" + bestStreak() + "</b><span>Best</span></div>";
+  }
+  $("exportBtn").onclick = function () {
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(S, null, 2)], { type: "application/json" }));
+    a.download = "my-checkins-" + TODAY + ".json";
+    a.click();
+  };
+  $("wipeBtn").onclick = function () {
+    if (!confirm("Delete all your check-ins from this phone? This can't be undone.")) return;
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    S = null; previewRep = null; showOnboard();
+  };
+
+  // ---------- playbook ----------
+  function renderReps() {
+    var counts = {};
+    Object.keys(S.days).forEach(function (k) { (S.days[k].reps || []).forEach(function (id) { counts[id] = (counts[id] || 0) + 1; }); });
+    $("repList").innerHTML = CONTENT.reps.map(function (r, i) {
+      return '<button class="rep-item" data-i="' + i + '"><strong>' + esc(r.title) + "</strong><small>" + (counts[r.id] ? "Done ×" + counts[r.id] : r.minutes + " min") + "</small></button>";
+    }).join("");
+  }
+  $("repList").onclick = function (e) {
+    var b = e.target.closest(".rep-item"); if (!b) return;
+    previewRep = CONTENT.reps[+b.getAttribute("data-i")];
+    render(); show("today");
+    $("repCard").scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  // ---------- navigation ----------
+  function show(name) {
+    document.querySelectorAll(".view").forEach(function (v) { v.classList.toggle("on", v.id === "v-" + name); });
+    document.querySelectorAll("#tabs button").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-tab") === name); });
+    window.scrollTo(0, 0);
+  }
+  $("tabs").onclick = function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    var t = b.getAttribute("data-tab");
+    if (t === "today") previewRep = null;
+    render(); show(t);
+  };
+  function render() { if (!S) return; renderToday(); renderTrends(); renderReps(); }
+
+  // ---------- start ----------
+  if (!S) { showOnboard(); return; }
+  var last = ""; try { last = localStorage.getItem("app_last_open") || ""; } catch (e) {}
+  if (last !== TODAY) { track("open"); try { localStorage.setItem("app_last_open", TODAY); } catch (e) {} }
+  fillForm(); render(); show("today");
+})();
+</script>
+</body>
+</html>

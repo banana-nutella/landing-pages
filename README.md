@@ -60,6 +60,24 @@ The small app preview on each variant (the stats card, chat bubbles, etc.) is in
 
 Changing copy mid-test resets what you're measuring for that variant. To do it cleanly, write down the current numbers, then clear that variant's rows in both tabs of the sheet.
 
+## The early app (MVP) at `/app`
+
+A small working version of the product: a daily check-in (mood, stress, sleep, training) plus one short "rep" a day, with trends and patterns after a few days. It mixes variant A (training log) and variant B (playbook).
+
+- **Where people find it:** the thank-you screen after signing up has a "Try the early version" button. You can also send `https://landing-pages-phi-ten.vercel.app/app` to people directly.
+- **Privacy:** everything someone logs stays on their phone (browser storage). No account, no name. Clearing browser data deletes it.
+- **What you see:** the **App** tab in your Google Sheet records only *that* something happened (opened, checked in, did a rep), which day of using the app it was, which landing variant they came from, and their chosen goal. Never their check-in numbers or notes.
+- **Stats:** `/stats` has an "Early app" section. The number that matters is **Came back (2+ days)**.
+- **Edit the reps:** all daily reps are in `app-content.js`. Same editing steps as `copy.js`.
+- **Safety:** the crisis line (988 / findahelpline.com) shows at the bottom of every app screen, and prominently when someone logs mood 1–2. Edit it in `app-content.js`.
+- **Your own testing:** open `/app?notrack=1` once on your phone so your usage isn't counted.
+
+**One-time sheet script update (needed for the app numbers):** the app needs the newer version of the script.
+1. Open your sheet → **Extensions → Apps Script**.
+2. Select everything in the editor and delete it. Paste in the new [`google-sheet/Code.gs`](google-sheet/Code.gs).
+3. Put the same secret back on the `const SECRET = '...'` line. Click 💾 save.
+4. **Deploy → Manage deployments** → click the ✏️ pencil → **Version: New version** → **Deploy**. The URL stays the same, so nothing else changes.
+
 ## How to add a custom domain
 
 1. Buy a domain anywhere (Namecheap, Cloudflare, Google/Squarespace Domains, or in Vercel itself).

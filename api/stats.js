@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
   if (!pw || !same(req.headers["x-stats-password"] || "", pw)) return res.status(401).json({ ok: false });
   try {
     const d = await callSheet({ type: "stats" });
-    res.status(200).json({ variants: d.variants, sources: d.sources });
+    res.status(200).json({ variants: d.variants, sources: d.sources, app: d.app || null });
   } catch (e) {
     console.error(e);
     res.status(500).json({ ok: false });

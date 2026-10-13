@@ -1,6 +1,6 @@
 // Paste this whole file into your Google Sheet: Extensions → Apps Script.
 // Then change the SECRET line below to the value you were given, and deploy as a Web app.
-// It creates two tabs automatically: "Signups" and "Visits".
+// It creates three tabs automatically: "Signups", "Visits" and "App".
 
 const SECRET = 'PASTE_SECRET_HERE';
 
@@ -8,6 +8,8 @@ const SIGNUP_HEADERS = ['timestamp', 'email', 'variant', 'help_with', 'open_to_c
   'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'referrer', 'visitor_id'];
 const VISIT_HEADERS = ['timestamp', 'variant', 'visitor_id',
   'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'referrer'];
+// App usage only: what happened, never what someone wrote or logged.
+const APP_HEADERS = ['timestamp', 'visitor_id', 'event', 'app_day', 'landing_variant', 'goal'];
 
 function doPost(e) {
   let data;
@@ -29,6 +31,8 @@ function doPost(e) {
       sheet('Visits', VISIT_HEADERS).appendRow([now, data.variant, data.vid,
         data.utm_source, data.utm_medium, data.utm_campaign, data.utm_term, data.utm_content,
         data.referrer].map(safe));
+    } else if (data.type === 'event') {
+      sheet('App', APP_HEADERS).appendRow([now, data.vid, data.event, data.app_day, data.variant, data.goal].map(safe));
     } else {
       return reply({ ok: false, error: 'unknown type' });
     }
@@ -69,7 +73,30 @@ function stats() {
     bump(src, v, 'signups');
   });
 
-  return { ok: true, variants: variants, sources: Object.keys(sources).map(k => sources[k]) };
+  return { ok: true, variants: variants, sources: Object.keys(sources).map(k => sources[k]), app: appStats() };
+}
+
+// App retention: of the people who opened the app, how many keep checking in?
+function appStats() {
+  const users = {};
+  rows('App', APP_HEADERS).forEach(r => {
+    const id = String(r[1]), ev = String(r[2]), d = Number(r[3]) || 0;
+    if (!id) return;
+    const u = users[id] || (users[id] = { variant: String(r[4] || ''), checkinDays: {}, checkins: 0, reps: 0 });
+    if (ev === 'checkin') { u.checkins++; u.checkinDays[d] = true; }
+    if (ev === 'rep_done') u.reps++;
+  });
+  const out = { users: 0, checkedIn: 0, twoPlusDays: 0, weekPlus: 0, checkins: 0, reps: 0, byVariant: {} };
+  Object.keys(users).forEach(id => {
+    const u = users[id], days = Object.keys(u.checkinDays).map(Number);
+    const v = out.byVariant[u.variant || '-'] || (out.byVariant[u.variant || '-'] = { users: 0, twoPlusDays: 0 });
+    out.users++; v.users++;
+    out.checkins += u.checkins; out.reps += u.reps;
+    if (days.length) out.checkedIn++;
+    if (days.length >= 2) { out.twoPlusDays++; v.twoPlusDays++; }
+    if (days.some(d => d >= 7)) out.weekPlus++;
+  });
+  return out;
 }
 
 function sheet(name, headers) {
