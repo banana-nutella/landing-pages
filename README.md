@@ -2,13 +2,13 @@
 
 **Live:** https://landing-pages-phi-ten.vercel.app
 
-Three versions of one landing page. Each tests a different pitch for the same app, and every visitor sees one of them. Each signup and unique visitor is saved to a Google Sheet, and `/stats` shows which pitch converts best.
+Two versions of one landing page. Each tests a different pitch for the same app, and every visitor sees one of them. Each signup and unique visitor is saved to a Google Sheet, and `/stats` shows which pitch converts best.
 
 | URL | What it does |
 |---|---|
-| `/` | Randomly sends each new visitor to A, B or C, and keeps them on it (cookie) |
-| `/?v=b` | Forces variant B (works for a, b, c) |
-| `/a` `/b` `/c` | The three variants directly |
+| `/` | Randomly sends each new visitor to A or B, and keeps them on it (cookie) |
+| `/?v=b` | Forces variant B (works for a, b) |
+| `/a` `/b` | The two variants directly |
 | `/stats` | Password-protected results |
 
 **Always share the root URL (`/`) in your posts and ads**, with UTM tags (see below). Only use `/a`, `/b`, etc. to preview a page.
@@ -56,7 +56,7 @@ All the words on the site live in one file: **`copy.js`**. That covers headlines
 3. Click **Commit changes…** → **Commit changes**.
 4. Vercel redeploys automatically. The change is live in about a minute.
 
-The small app preview on each variant (the stats card, chat bubbles, etc.) is in `src/previews/a.html`, `b.html`, `c.html`. The words in there can be edited the same way. Only change text between `>` and `<`.
+The small app preview on each variant (the stats card, chat bubbles, etc.) is in `src/previews/a.html` and `b.html`. The words in there can be edited the same way. Only change text between `>` and `<`.
 
 Changing copy mid-test resets what you're measuring for that variant. To do it cleanly, write down the current numbers, then clear that variant's rows in both tabs of the sheet.
 

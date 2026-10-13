@@ -18,6 +18,11 @@
       "source": "/d",
       "destination": "/",
       "permanent": false
+    },
+    {
+      "source": "/c",
+      "destination": "/",
+      "permanent": false
     }
   ]
 }

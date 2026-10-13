@@ -35,11 +35,5 @@ module.exports = {
       subline: "Short daily reps that make you better under pressure, in relationships, and at work.",
       tags: ["5-min daily reps", "Pressure", "Relationships", "Work"],
     },
-    c: {
-      name: "Anonymous",
-      headline: "Talk it out. Nobody has to know.",
-      subline: "Anonymous, judgment-free space built for guys who'd never post about this.",
-      tags: ["100% anonymous", "No real names", "No judgment"],
-    },
   },
 };
