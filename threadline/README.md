@@ -2,21 +2,31 @@
 
 A brainstorming tool for convergent thinkers. Dump raw ideas, let the AI find non-obvious, typed connections between them (and explain why), accept or reject them, then converge on the three strongest threads.
 
-## Setup
+## Deployment (Vercel)
 
-Requires Node 20+ (tested on 22).
+Threadline is deployed as its own Vercel project, **threadline** (team "idk"), linked to this repo with **Root Directory = `threadline`**. The landing pages keep their own project; the two don't affect each other ("skip deployments when the root directory hasn't changed" is on).
+
+- Production URL: https://threadline-idk-52a7.vercel.app
+- Production deploys come from `main` once this branch is merged; pushes to other branches get preview deployments.
+- `threadline/vercel.json` overrides the landing pages' root `vercel.json` (which would otherwise make Vercel run `node build.js`).
+- Vercel Authentication is on (the team default), so only people logged in to your Vercel team can open it. That keeps strangers from spending your API credits.
+
+**Required environment variable:** in Vercel → threadline → Settings → Environment Variables, add `ANTHROPIC_API_KEY` (Production and Preview), then redeploy (Deployments → ⋯ → Redeploy). Without it the app loads but both AI buttons show "ANTHROPIC_API_KEY is not set".
+
+The API routes allow up to 120 seconds (`maxDuration`), which a connection run can need.
+
+## Local development (optional)
+
+Requires Node 20+.
 
 ```bash
 cd threadline
 npm install
-cp .env.example .env.local      # then put your key in it:
-# ANTHROPIC_API_KEY=sk-ant-...
-npm run dev
+cp .env.example .env.local      # then set ANTHROPIC_API_KEY=sk-ant-...
+npm run dev                      # http://localhost:3000
 ```
 
-Open http://localhost:3000. The first visit loads ten example ideas (marked "example"); press **Clear** on the yellow banner to start with your own.
-
-The key is only read on the server (`app/api/*`), never sent to the browser.
+The first visit loads ten example ideas (marked "example"); press **Clear** on the yellow banner to start with your own. The key is only read on the server (`app/api/*`), never sent to the browser.
 
 ## How it works
 
@@ -47,10 +57,11 @@ Everything is stored in your browser's `localStorage` (key `threadline:v1`). The
 
 ## Checking AI output quality
 
-With the dev server running, in another terminal:
+Against the deployment or a local dev server:
 
 ```bash
-npm run try-examples
+npm run try-examples                                             # http://localhost:3000
+THREADLINE_URL=https://<deployment-url> npm run try-examples      # needs Vercel Auth bypass if protection is on
 ```
 
 This runs the example ideas through Connect, accepts connections with confidence ≥ 0.5 and rejects the rest, runs Connect again with those rejections, then Converges, printing everything.
