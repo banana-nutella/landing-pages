@@ -58,8 +58,6 @@ All the words on the site live in one file: **`copy.js`**. That covers headlines
 
 The small app preview on each variant (the stats card, chat bubbles, etc.) is in `src/previews/a.html`, `b.html`, `c.html`, `d.html`. The words in there can be edited the same way. Only change text between `>` and `<`.
 
-The "Built for men" label in the top-right corner is in `src/page.html` (search for it).
-
 Changing copy mid-test resets what you're measuring for that variant. To do it cleanly, write down the current numbers, then clear that variant's rows in both tabs of the sheet.
 
 ## How to add a custom domain
